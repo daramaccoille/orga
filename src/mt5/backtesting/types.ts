@@ -7,6 +7,7 @@ export interface LayerConfig {
 }
 
 export interface NeuralConfig {
+  layers: any;
   inputFeatures: string[];
   inputShape: number[];
   batchSize?: number;

@@ -1,64 +1,4 @@
 export class HarmonicPatternAnalyzer {
-    constructor() {
-        this.PATTERN_RATIOS = {
-            GARTLEY: {
-                XA: 0.618,
-                AB: 0.382,
-                BC: 0.886,
-                CD: 1.272,
-                tolerance: 0.05,
-            },
-            BAT: {
-                XA: 0.382,
-                AB: 0.382,
-                BC: 0.886,
-                CD: 2.618,
-                tolerance: 0.05,
-            },
-            BUTTERFLY: {
-                XA: 0.786,
-                AB: 0.382,
-                BC: 0.886,
-                CD: 1.618,
-                tolerance: 0.05,
-            },
-            CRAB: {
-                XA: 0.618,
-                AB: 0.382,
-                BC: 0.886,
-                CD: 3.618,
-                tolerance: 0.05,
-            },
-            SHARK: {
-                XA: 0.886,
-                AB: 0.446,
-                BC: 0.618,
-                CD: 2.24,
-                tolerance: 0.05,
-            },
-            CYPHER: {
-                XA: 0.382,
-                AB: 0.618,
-                BC: 1.272,
-                CD: 0.786,
-                tolerance: 0.05,
-            },
-            DEEP_CRAB: {
-                XA: 0.886,
-                AB: 0.382,
-                BC: 2.618,
-                CD: 1.618,
-                tolerance: 0.05,
-            },
-            THREE_DRIVES: {
-                XA: 0.618,
-                AB: 1.272,
-                BC: 0.618,
-                CD: 1.272,
-                tolerance: 0.05,
-            },
-        };
-    }
     findSwingPoints(prices) {
         const swings = [];
         const pivotLength = 5;
@@ -113,7 +53,7 @@ export class HarmonicPatternAnalyzer {
         for (let i = 0; i < swings.length - 4; i++) {
             const points = swings.slice(i, i + 5);
             const ratios = this.calculateRatios(points);
-            for (const [patternType, idealRatios] of Object.entries(this.PATTERN_RATIOS)) {
+            for (const [patternType, idealRatios] of Object.entries(HarmonicPatternAnalyzer.PATTERN_RATIOS)) {
                 if (this.matchesPattern(ratios, idealRatios)) {
                     patterns.push({
                         type: patternType,
@@ -141,4 +81,78 @@ export class HarmonicPatternAnalyzer {
         // Implement quality calculation based on pattern type and points
         return 0; // Placeholder
     }
+    isSwingHigh(prices, index, length) {
+        const price = prices[index];
+        for (let i = index - length; i <= index + length; i++) {
+            if (i !== index && prices[i] > price)
+                return false;
+        }
+        return true;
+    }
+    isSwingLow(prices, index, length) {
+        const price = prices[index];
+        for (let i = index - length; i <= index + length; i++) {
+            if (i !== index && prices[i] < price)
+                return false;
+        }
+        return true;
+    }
 }
+HarmonicPatternAnalyzer.PATTERN_RATIOS = {
+    GARTLEY: {
+        XA: 0.618,
+        AB: 0.382,
+        BC: 0.886,
+        CD: 1.272,
+        tolerance: 0.05,
+    },
+    BAT: {
+        XA: 0.382,
+        AB: 0.382,
+        BC: 0.886,
+        CD: 2.618,
+        tolerance: 0.05,
+    },
+    BUTTERFLY: {
+        XA: 0.786,
+        AB: 0.382,
+        BC: 0.886,
+        CD: 1.618,
+        tolerance: 0.05,
+    },
+    CRAB: {
+        XA: 0.618,
+        AB: 0.382,
+        BC: 0.886,
+        CD: 3.618,
+        tolerance: 0.05,
+    },
+    SHARK: {
+        XA: 0.886,
+        AB: 0.446,
+        BC: 0.618,
+        CD: 2.24,
+        tolerance: 0.05,
+    },
+    CYPHER: {
+        XA: 0.382,
+        AB: 0.618,
+        BC: 1.272,
+        CD: 0.786,
+        tolerance: 0.05,
+    },
+    DEEP_CRAB: {
+        XA: 0.886,
+        AB: 0.382,
+        BC: 2.618,
+        CD: 1.618,
+        tolerance: 0.05,
+    },
+    THREE_DRIVES: {
+        XA: 0.618,
+        AB: 1.272,
+        BC: 0.618,
+        CD: 1.272,
+        tolerance: 0.05,
+    },
+};

@@ -16,7 +16,12 @@ const redisClient: RedisClientType = createClient();
 redisClient.on('error', (err) => console.log('Redis Client Error', err));
 
 async function connectToRedis() {
-  await redisClient.connect();
+  try {
+    await redisClient.connect();
+    console.log('Successfully connected to Redis'); 
+  } catch (error) {
+    console.error('Failed to connect to Redis:', error);
+  }
 }
 
 connectToRedis();
@@ -29,19 +34,19 @@ const port =
     : 8080;
 
 app.use(express.static(path.join(__dirname, 'public')))
-  app.set('views', path.join(__dirname, 'views'))
-  app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '../views'));
+app.set('view engine', 'ejs');
 
-app.get('/', (req, res) => {
-  res.render('index');
-});
 
-app.get('/api', async (req, res) => {
+  app.get('/', (req: express.Request, res: express.Response) => {
+    res.render('index');
+  });
 
-  await redisClient.set('mykey', 'Hello from Redis!!!');
-  const value = await redisClient.get('mykey');
-  res.json({ "msg": "Hello world", "redisValue": value });
-});
+  app.get('/api', async (req: express.Request, res: express.Response) => {
+    await redisClient.set('mykey', 'Hello from Redis!!!');
+    const value = await redisClient.get('mykey');
+    res.json({ "msg": "Hello world", "redisValue": value });
+  });
 
 
 app.listen(port, () => {

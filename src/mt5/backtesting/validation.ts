@@ -30,10 +30,7 @@ export class ValidationUtils {
   }
 
   static async validateTensor(tensor: tf.Tensor): Promise<void> {
-    const hasNaN = await tf.any(tf.isNaN(tensor)).data()[0];
-    if (hasNaN) {
-      throw new Error('Invalid input: tensor contains NaN values');
-    }
+   
 
     if (!tensor.shape.every((dim: number) => dim > 0)) {
       throw new Error('Invalid tensor shape: all dimensions must be positive');

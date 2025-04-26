@@ -1,4 +1,7 @@
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:2597805074.
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:3936713146.
 import { Client } from 'whatsapp-web.js';
+import { NotificationProvider, EnhancedAlert } from '../../types';
 
 export class WhatsAppNotifier implements NotificationProvider {
   private client: Client;
@@ -33,4 +36,15 @@ export class WhatsAppNotifier implements NotificationProvider {
       this.recipients.map((recipient) => this.client.sendMessage(recipient, message))
     );
   }
+// add helper methods for formatMessage using
+  private formatMessage(alert: EnhancedAlert): string {
+    return `
+*Alert Notification*
+*Symbol:* ${alert.symbol}
+*Action:* ${alert.action}
+*Price:* ${alert.price}
+*Timestamp:* ${new Date(alert.timestamp).toLocaleString()}
+    `;
+  }
+
 }

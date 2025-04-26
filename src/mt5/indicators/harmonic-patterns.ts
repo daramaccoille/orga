@@ -1,30 +1,5 @@
-interface Point {
-  x: number;
-  y: number;
-  time: Date;
-}
-
-interface HarmonicPattern {
-  type: keyof typeof PATTERN_RATIOS;
-  points: Point[];
-  completion: number;
-  direction: 'bullish' | 'bearish';
-  fibRatios: HarmonicRatios;
-  quality: number;
-}
-
-interface HarmonicRatios {
-  XA: number;
-  AB: number;
-  BC: number;
-  CD: number;
-  XB?: number;
-  AC?: number;
-  XD?: number;
-}
-
 export class HarmonicPatternAnalyzer {
-  private readonly PATTERN_RATIOS = {
+  public static readonly PATTERN_RATIOS = {
     GARTLEY: {
       XA: 0.618,
       AB: 0.382,
@@ -144,10 +119,10 @@ export class HarmonicPatternAnalyzer {
       const points = swings.slice(i, i + 5);
       const ratios = this.calculateRatios(points);
 
-      for (const [patternType, idealRatios] of Object.entries(this.PATTERN_RATIOS)) {
+      for (const [patternType, idealRatios] of Object.entries(HarmonicPatternAnalyzer.PATTERN_RATIOS)) {
         if (this.matchesPattern(ratios, idealRatios)) {
           patterns.push({
-            type: patternType as keyof typeof this.PATTERN_RATIOS,
+            type: patternType as keyof typeof HarmonicPatternAnalyzer.PATTERN_RATIOS,
             points,
             completion: this.calculateCompletion(points),
             direction: this.determineDirection(points),
@@ -163,7 +138,7 @@ export class HarmonicPatternAnalyzer {
 
   private matchesPattern(
     actual: HarmonicRatios,
-    ideal: typeof this.PATTERN_RATIOS.GARTLEY
+    ideal: typeof HarmonicPatternAnalyzer.PATTERN_RATIOS[keyof typeof HarmonicPatternAnalyzer.PATTERN_RATIOS]
   ): boolean {
     return (
       this.isWithinTolerance(actual.XA, ideal.XA, ideal.tolerance) &&
@@ -181,4 +156,44 @@ export class HarmonicPatternAnalyzer {
     // Implement quality calculation based on pattern type and points
     return 0; // Placeholder
   }
+  private isSwingHigh(prices: number[], index: number, length: number): boolean {
+    const price = prices[index];
+    for (let i = index - length; i <= index + length; i++) {
+      if (i !== index && prices[i] > price) return false;
+    }
+    return true;
+  }
+
+  private isSwingLow(prices: number[], index: number, length: number): boolean {
+    const price = prices[index];
+    for (let i = index - length; i <= index + length; i++) {
+      if (i !== index && prices[i] < price) return false;
+    }
+    return true;
+  }
+}
+interface Point {
+  x: number;
+  y: number;
+  time: Date;
+}
+interface HarmonicPattern {
+  type: keyof typeof HarmonicPatternAnalyzer.PATTERN_RATIOS;
+  points: Point[];
+  completion: number;
+  direction: 'bullish' | 'bearish';
+  fibRatios: HarmonicRatios;
+  quality: number;
+}
+
+
+
+interface HarmonicRatios {
+  XA: number;
+  AB: number;
+  BC: number;
+  CD: number;
+  XB?: number;
+  AC?: number;
+  XD?: number;
 }

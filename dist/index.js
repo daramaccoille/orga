@@ -20,7 +20,13 @@ const redisClient = createClient();
 redisClient.on('error', (err) => console.log('Redis Client Error', err));
 function connectToRedis() {
     return __awaiter(this, void 0, void 0, function* () {
-        yield redisClient.connect();
+        try {
+            yield redisClient.connect();
+            console.log('Successfully connected to Redis');
+        }
+        catch (error) {
+            console.error('Failed to connect to Redis:', error);
+        }
     });
 }
 connectToRedis();
@@ -30,7 +36,7 @@ const port = process.env.PORT !== undefined
         ? parseInt(process.argv[3], 10)
         : 8080;
 app.use(express.static(path.join(__dirname, 'public')));
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
 app.get('/', (req, res) => {
     res.render('index');

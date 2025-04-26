@@ -68,6 +68,11 @@ export class MT5Agent {
                     }
                     catch (error) {
                         console.error('Error processing MT5 message:', error);
+                        console.log('Retrying message processing after 1 second...');
+                        yield new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
+                        // Retry processing the same message
+                        this.startListening(); // Recursively call startListening to process the message again
+                        return; // Stop the current loop to avoid processing the same message multiple times
                     }
                 }
             }
@@ -82,17 +87,19 @@ export class MT5Agent {
     }
     openPosition(position) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Get account info for risk calculation
-            const accountInfo = yield this.getAccountInfo();
-            // Validate trade against risk parameters
-            yield this.riskManager.validateTrade(accountInfo.balance, position);
-            const result = yield this.openPosition(position);
-            // Update dashboard
-            this.dashboard.updateData({
-                positions: yield this.getPositions(),
-                accountInfo: yield this.getAccountInfo(),
-            });
-            return result;
+            const command = {
+                action: 'OPEN_POSITION',
+                data: {
+                    symbol: position.symbol,
+                    type: position.type,
+                    volume: position.volume,
+                    price: position.price,
+                    stopLoss: position.stopLoss,
+                },
+            };
+            yield this.pushSocket.send(JSON.stringify(command));
+            const response = yield this.pullSocket.receive();
+            return JSON.parse(response.toString());
         });
     }
     closePosition(ticket) {

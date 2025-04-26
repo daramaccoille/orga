@@ -7,9 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-export class EnhancedAlertManager extends AlertManager {
+export class EnhancedAlertManager {
     constructor(socket) {
-        super(socket);
         this.initializeNotificationProviders();
     }
     initializeNotificationProviders() {
@@ -43,5 +42,46 @@ export class EnhancedAlertManager extends AlertManager {
                 }
             }
         });
+    }
+    // add helper methods
+    evaluateCondition(value, condition) {
+        switch (condition.operator) {
+            case '>': return value > condition.value;
+            case '<': return value < condition.value;
+            case '>=': return value >= condition.value;
+            case '<=': return value <= condition.value;
+            case '==': return value == condition.value;
+            default: return false;
+        }
+    }
+}
+class BaseNotifier {
+    constructor(providerName) {
+        this.providerName = providerName;
+    }
+    send(alert) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Sending ${this.providerName} notification for alert:`, alert);
+        });
+    }
+}
+class EmailNotifier extends BaseNotifier {
+    constructor() {
+        super('EMAIL');
+    }
+}
+class TelegramNotifier extends BaseNotifier {
+    constructor() {
+        super('TELEGRAM');
+    }
+}
+class DiscordNotifier extends BaseNotifier {
+    constructor() {
+        super('DISCORD');
+    }
+}
+class WebhookNotifier extends BaseNotifier {
+    constructor() {
+        super('WEBHOOK');
     }
 }

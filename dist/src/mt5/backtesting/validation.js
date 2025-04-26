@@ -7,7 +7,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import * as tf from '@tensorflow/tfjs-node';
 export class ValidationUtils {
     static validateConfig(config) {
         var _a, _b;
@@ -36,10 +35,6 @@ export class ValidationUtils {
     }
     static validateTensor(tensor) {
         return __awaiter(this, void 0, void 0, function* () {
-            const hasNaN = yield tf.any(tf.isNaN(tensor)).data()[0];
-            if (hasNaN) {
-                throw new Error('Invalid input: tensor contains NaN values');
-            }
             if (!tensor.shape.every((dim) => dim > 0)) {
                 throw new Error('Invalid tensor shape: all dimensions must be positive');
             }

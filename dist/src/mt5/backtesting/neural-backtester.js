@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import * as tf from '@tensorflow/tfjs-node';
+import { AdvancedBacktester } from './advanced-backtester';
 export class NeuralBacktester extends AdvancedBacktester {
     constructor(config) {
         super();
@@ -53,6 +54,9 @@ export class NeuralBacktester extends AdvancedBacktester {
             return tf.tensor3d(this.preprocessData(data));
         });
     }
+    fetchMarketData(symbol, startDate, endDate) {
+        throw new Error('Method not implemented.');
+    }
     trainAndPredict(features) {
         return __awaiter(this, void 0, void 0, function* () {
             const [trainFeatures, testFeatures] = tf.split(features, 2);
@@ -64,4 +68,29 @@ export class NeuralBacktester extends AdvancedBacktester {
             return this.model.predict(testFeatures);
         });
     }
+    prepareLabelData() {
+        // Prepare labels for training
+        const labels = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0];
+        return tf.tensor1d(labels);
+    }
+    // add helper methods
+    calculateAccuracy(predictions, trades) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const actualLabels = trades.map(trade => (trade.profit > 0 ? 1 : 0));
+            const predictedLabels = (yield predictions.data()).map(p => (p > 0.5 ? 1 : 0));
+            const correctPredictions = actualLabels.filter((label, index) => label === predictedLabels[index]).length;
+            return correctPredictions / actualLabels.length;
+        });
+    }
+    calculateConfidenceScores(predictions) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = yield predictions.data();
+            return data.map(p => (p > 0.5 ? p : 1 - p));
+        });
+    }
+    preprocessData(data) {
+        // transform data to tensor
+        return data.map(d => [d.open, d.high, d.low, d.close]);
+    }
 }
+// add type definitions

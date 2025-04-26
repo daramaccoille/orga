@@ -1,5 +1,4 @@
 import * as zmq from 'zeromq';
-import dotenv from 'dotenv';
 import { RiskManager, RiskParameters } from './risk-manager';
 import { MarketAnalyzer } from './market-analyzer';
 import { TradeDashboard } from './dashboard';
@@ -70,26 +69,33 @@ export class MT5Agent {
         });
       } catch (error) {
         console.error('Error processing MT5 message:', error);
+        console.log('Retrying message processing after 1 second...');
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
+        // Retry processing the same message
+        this.startListening(); // Recursively call startListening to process the message again
+        return; // Stop the current loop to avoid processing the same message multiple times
       }
     }
   }
+  
 
-  async openPosition(position: MT5Position) {
-    // Get account info for risk calculation
-    const accountInfo = await this.getAccountInfo();
+ async openPosition(position: MT5Position) {
+    const command = {
+      action: 'OPEN_POSITION',
+      data: {
+        symbol: position.symbol,
+        type: position.type,
+        volume: position.volume,
+        price: position.price,
+        stopLoss: position.stopLoss,
+      },
+    };
 
-    // Validate trade against risk parameters
-    await this.riskManager.validateTrade(accountInfo.balance, position);
-
-    const result = await this.openPosition(position);
-
-    // Update dashboard
-    this.dashboard.updateData({
-      positions: await this.getPositions(),
-      accountInfo: await this.getAccountInfo(),
-    });
-
-    return result;
+    await this.pushSocket.send(JSON.stringify(command));
+    const response = await this.pullSocket.receive();
+    return JSON.parse(response.toString());
+  
+    
   }
 
   async closePosition(ticket: number) {

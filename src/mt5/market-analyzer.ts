@@ -35,7 +35,10 @@ export class MarketAnalyzer {
   private async updateIndicators(symbol: string) {
     const data = this.historicalData.get(symbol) || [];
     const prices = data.map((d) => (d.bid + d.ask) / 2);
-
+    if (prices.length < 200) {
+      console.log(`Not enough data for ${symbol} to calculate indicators.`);
+      return; 
+    }
     const indicators: TechnicalIndicators = {
       rsi: this.calculateRSI(prices),
       macd: this.calculateMACD(prices),

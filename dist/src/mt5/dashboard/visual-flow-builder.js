@@ -1,4 +1,6 @@
+import { HarmonicPatternAnalyzer } from '../indicators/harmonic-patterns';
 export class VisualFlowBuilder {
+    handleNodeClick(event) { }
     constructor(canvasId) {
         this.nodes = new Map();
         this.canvas = document.getElementById(canvasId);
@@ -17,6 +19,7 @@ export class VisualFlowBuilder {
             data,
             position,
             connections: [],
+            typeFlow: 'INDICATOR'
         };
         this.nodes.set(node.id, node);
         this.drawNode(node);
@@ -30,6 +33,9 @@ export class VisualFlowBuilder {
         this.ctx.fillStyle = 'white';
         this.ctx.fillText(node.type, node.position.x + 10, node.position.y + 30);
     }
+    getNodeColor(type) {
+        throw new Error('Method not implemented.');
+    }
     drawConnections() {
         this.nodes.forEach((node) => {
             node.connections.forEach((targetId) => {
@@ -40,8 +46,14 @@ export class VisualFlowBuilder {
             });
         });
     }
+    drawConnection(node, target) {
+        throw new Error('Method not implemented.');
+    }
     exportStrategy() {
         return this.convertNodesToStrategy(Array.from(this.nodes.values()));
+    }
+    convertNodesToStrategy(arg0) {
+        throw new Error('Method not implemented.');
     }
     showConfigPanel(node) {
         // Base implementation
@@ -54,12 +66,18 @@ export class EnhancedVisualFlowBuilder extends VisualFlowBuilder {
         this.configPanel = document.getElementById(configPanelId);
         this.initializeConfigPanel();
     }
+    initializeConfigPanel() {
+        throw new Error('Method not implemented.');
+    }
     handleNodeClick(event) {
         const node = this.findNodeAtPosition(event.offsetX, event.offsetY);
         if (node) {
             this.selectedNode = node;
             this.showConfigPanel(node);
         }
+    }
+    findNodeAtPosition(offsetX, offsetY) {
+        return null;
     }
     getNodeConfig(type) {
         switch (type) {
@@ -78,7 +96,7 @@ export class EnhancedVisualFlowBuilder extends VisualFlowBuilder {
                     id: 'pattern-config',
                     type: 'PATTERN',
                     parameters: new Map([
-                        ['patternType', { type: 'select', options: Object.keys(PATTERN_RATIOS) }],
+                        ['patternType', { type: 'select', options: Object.keys(HarmonicPatternAnalyzer.PATTERN_RATIOS) }],
                         ['tolerance', { type: 'number', default: 0.05, min: 0.01, max: 0.1 }],
                     ]),
                     validation: (value) => value >= 0.01 && value <= 0.1,

@@ -36,13 +36,36 @@ export class AdvancedNeuralArchitectures {
     trainModel(model, data, labels) {
         return __awaiter(this, void 0, void 0, function* () {
             // ... method implementation
+            const result = yield model.fit(data, labels, {
+                epochs: 10,
+                batchSize: 32
+            });
+            return result;
         });
     }
     validateInput(tensor) {
         return tensor != null && tensor.shape.length > 0;
     }
     createLayer(config) {
-        // ... method implementation
+        return __awaiter(this, void 0, void 0, function* () {
+            // ... method implementation
+            let loss = 0;
+            const history = yield tf.model.fit(tf.data, labels, {
+                epochs: 10,
+                batchSize: 32,
+                callbacks: {
+                    onEpochEnd: (_epoch, logs) => __awaiter(this, void 0, void 0, function* () {
+                        if (logs && logs.loss !== undefined) {
+                            loss = logs.loss;
+                        }
+                    })
+                }
+            });
+            if (history.history.loss) {
+                return history;
+            }
+            throw new Error("history.history.loss is undefined");
+        });
     }
     buildAdaptiveModel(config) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -91,7 +114,7 @@ export class AdvancedNeuralArchitectures {
                 };
             }
             catch (error) {
-                throw new Error(`Failed to build GAN model: ${error.message}`);
+                throw new Error(`Failed to build GAN model: ${Error.toString}`);
             }
         });
     }
@@ -110,7 +133,7 @@ export class AdvancedNeuralArchitectures {
                 };
             }
             catch (error) {
-                throw new Error(`Failed to build AutoEncoder: ${error.message}`);
+                throw new Error(`Failed to build AutoEncoder: ${Error.toString}`);
             }
         });
     }

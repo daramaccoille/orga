@@ -13,7 +13,7 @@ export class TradeDashboard {
   private app: express.Application;
   private server: http.Server;
   private io: Server;
-  private data: DashboardData;
+  private data!: DashboardData;
 
   constructor() {
     this.app = express();

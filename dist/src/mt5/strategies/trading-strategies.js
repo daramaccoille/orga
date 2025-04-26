@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 export class TradingStrategies {
     constructor(riskParams) {
         this.riskParams = riskParams;
+        this.timeframes = {}; // Initialize timeframes
     }
     macdStrategy(indicators) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -68,6 +69,59 @@ export class TradingStrategies {
                 action: 'HOLD',
                 confidence: 0.5,
                 reason: 'Fibonacci strategy implementation pending',
+            };
+        });
+    }
+    // add type checks for other strategies
+    movingAverageStrategy(indicators) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const sma20 = indicators.timeframes['1D'].sma20;
+            const sma50 = indicators.timeframes['1D'].sma50;
+            const rsi = indicators.timeframes['1D'].rsi;
+            if (sma20 > sma50 && rsi < 70) {
+                return {
+                    action: 'BUY',
+                    confidence: 0.7,
+                    reason: '20-day SMA above 50-day SMA with RSI < 70',
+                };
+            }
+            else if (sma20 < sma50 && rsi > 30) {
+                return {
+                    action: 'SELL',
+                    confidence: 0.7,
+                    reason: '20-day SMA below 50-day SMA with RSI > 30',
+                };
+            }
+            return {
+                action: 'HOLD',
+                confidence: 0.5,
+                reason: 'No clear moving average signal',
+            };
+        });
+    }
+    // add more methods for other strategies
+    bollingerBandStrategy(indicators) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const bb = indicators.timeframes['1H'].bollingerBands;
+            const close = indicators.timeframes['1H'].close;
+            if (close < bb.lowerBand) {
+                return {
+                    action: 'BUY',
+                    confidence: 0.6,
+                    reason: 'Price below lower Bollinger Band',
+                };
+            }
+            else if (close > bb.upperBand) {
+                return {
+                    action: 'SELL',
+                    confidence: 0.6,
+                    reason: 'Price above upper Bollinger Band',
+                };
+            }
+            return {
+                action: 'HOLD',
+                confidence: 0.5,
+                reason: 'Price within Bollinger Bands',
             };
         });
     }

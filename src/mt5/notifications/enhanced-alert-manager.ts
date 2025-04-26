@@ -1,4 +1,4 @@
-interface EnhancedAlert extends Alert {
+interface EnhancedAlert  {
   channels: NotificationChannel[];
   expiryTime?: Date;
   repeatInterval?: number;
@@ -14,12 +14,12 @@ interface AlertCondition {
   timeframe?: '1H' | '4H' | '1D';
 }
 
-export class EnhancedAlertManager extends AlertManager {
-  private notificationProviders: Map<NotificationChannel, NotificationProvider>;
-  private activeAlerts: Map<string, EnhancedAlert>;
+export class EnhancedAlertManager  {
+  private notificationProviders!: Map<NotificationChannel, NotificationProvider>;
+  private activeAlerts!: Map<string, EnhancedAlert>;
 
   constructor(socket: any) {
-    super(socket);
+    
     this.initializeNotificationProviders();
   }
 
@@ -55,4 +55,61 @@ export class EnhancedAlertManager extends AlertManager {
       }
     }
   }
+  // add helper methods
+   private evaluateCondition(value: number, condition: AlertCondition): boolean {
+    switch (condition.operator) {
+      case '>': return value > (condition.value as number);
+      case '<': return value < (condition.value as number);
+      case '>=': return value >= (condition.value as number);
+      case '<=': return value <= (condition.value as number);
+      case '==': return value == (condition.value as number);
+      default: return false;
+    }
+  }
+// add notifier methods
 }
+ class BaseNotifier implements NotificationProvider {
+  constructor(private providerName: NotificationChannel) {}
+  async send(alert: EnhancedAlert): Promise<void> {
+    console.log(`Sending ${this.providerName} notification for alert:`, alert);
+  }
+}
+
+class EmailNotifier extends BaseNotifier {
+  constructor() {
+    super('EMAIL');
+  }
+}
+
+class TelegramNotifier extends BaseNotifier {
+  constructor() {
+    super('TELEGRAM');
+  }
+}
+
+class DiscordNotifier extends BaseNotifier {
+  constructor() {
+    super('DISCORD');
+  }
+}
+
+class WebhookNotifier extends BaseNotifier {
+  constructor() {
+    super('WEBHOOK');
+  }
+}
+
+interface NotificationProvider {
+  send(alert: EnhancedAlert): Promise<void>;
+}
+
+// add more types as needed
+// add symbol action timestamp price
+type NotificationPayload = {
+  symbol: string;
+  action: string;
+  timestamp: Date;
+  price: number;
+}
+
+

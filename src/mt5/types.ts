@@ -1,4 +1,42 @@
+
 // src/mt5/types.ts
+import * as tf from '@tensorflow/tfjs-node';
+export interface Point {
+  x: number;
+  y: number;
+  time: Date;
+}
+
+export interface HarmonicPattern {
+  type: string;
+  points: Point[];
+  completion: number;
+  direction: 'bullish' | 'bearish';
+  fibRatios: {
+    XA: number;
+    AB: number;
+    BC: number;
+    CD: number;
+    XB?: number;
+    AC?: number;
+    XD?: number;
+  };
+}
+// Export FlowNode for enhanced-flow-builder
+export interface FlowNode {
+  id: string;
+  type: string;
+  data: any;
+  position: { x: number; y: number };
+}
+export interface FlowNode {
+  id: string;
+  typeFlow: 'INDICATOR' | 'PATTERN' | 'FILTER' | 'CONDITION' | 'ACTION';
+  data: any;
+  position: { x: number; y: number };
+  connections: string[];
+}
+
 
 export interface TimeframedData {
   open: number[];
@@ -10,11 +48,33 @@ export interface TimeframedData {
 }
 
 export interface TradingStrategies {
-  [key: string]: any; // Example: MACD, RSI, etc. Add more specific properties as needed
+  macdStrategy: (indicators: any) => Promise<{ action: 'BUY' | 'SELL' | 'HOLD'; confidence: number }>;
 }
 
 export interface RiskManager {
-  [key: string]: any; // Example: StopLoss, TakeProfit. Add more specific properties as needed
+  validateTrade: (currentCapital: number, position: MT5Position) => Promise<boolean>;
+}
+
+export interface BacktestResult {
+  totalTrades: number;
+  winRate: number;
+  profitFactor: number;
+  netProfit: number;
+  maxDrawdown: number;
+  trades: Trade[];
+  equity: number[];
+  metrics: {
+    sharpeRatio: number;
+    sortino: number;
+    maxConsecutiveLosses: number;
+  };
+}
+
+export interface Trade {
+  entry: { price: number; time: Date };
+  exit: { price: number; time: Date };
+  profit: number;
+  type: 'BUY' | 'SELL';
 }
 
 export interface AdvancedBacktester {
@@ -27,23 +87,37 @@ export interface AdvancedBacktester {
   calculateProfitDistribution(trades: any): Promise<any>;
 }
 
+export interface NeuralBacktester{
+  [key: string]: any
+}
+
 export interface NeuralNetworkConfig {
     inputShape: number[];
     layers: LayerConfig[];
 }
+
+export interface GANConfig {
+  latentDim: number;
+  generatorLayers: LayerConfig[];
+  discriminatorLayers: number[];
+  inputFeatures: string[];
+  inputShape: number[];
+}
+
+export interface AutoEncoderConfig {
+  encoderLayers: number[];
+  decoderLayers: number[];
+  latentDim: number;
+  inputFeatures: string[];
+  inputShape: number[];
+}
+
 export interface LayerConfig {
     units: number;
     activation?: string;
+    dropoutRate?: number;
 }
-export interface HarmonicPattern {
-  type: string;
-  xA: number;
-  ab: number;
-  bc: number;
-  cd: number;
-  tolerance: number;
-  isBullish: boolean;
-}
+
 
 export interface Alert {
   symbol: string;
@@ -51,11 +125,21 @@ export interface Alert {
   action: string; // buy, sell, hold
 }
 
+
 export interface NotificationProvider {
   send(alert: EnhancedAlert): Promise<void>;
 }
 
-export interface MT5Position {
+export interface EnhancedAlert {
+  symbol: any;
+  action: any;
+  price: any;
+  timestamp: string | number | Date;
+  message: string;
+  type: string;
+}
+
+export interface MT5Position{
   ticket: number;
   symbol: string;
   type: number; // 0: buy, 1: sell
@@ -81,4 +165,13 @@ export interface AdvancedBacktestResult {
 export interface ModelResult {
   model: tf.LayersModel;
   train: (data: tf.Tensor) => Promise<tf.History>;
+}
+
+export interface OpenPositionResult {
+  retcode: number;
+  order: number;
+  deal: number;
+  comment: string;
+  request_id: number;
+  time_setup: string;
 }

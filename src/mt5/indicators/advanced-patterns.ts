@@ -36,6 +36,12 @@ export class AdvancedPatternAnalysis {
 
     return potentialPatterns.filter((p) => p !== null) as HarmonicPattern[];
   }
+  findThreeDrivesPattern(prices: number[]) {
+    throw new Error("Method not implemented.");
+  }
+  findBatPattern(prices: number[]) {
+    throw new Error("Method not implemented.");
+  }
 
   analyzeElliottWaves(prices: number[]): ElliottWave {
     // Implement Elliott Wave counting logic
@@ -46,6 +52,18 @@ export class AdvancedPatternAnalysis {
       subwaves: this.countSubwaves(waves),
       trend: this.determineWaveTrend(waves),
     };
+  }
+  determineWaveDegree(waves: number[]): "Primary" | "Intermediate" | "Minor" {
+    throw new Error("Method not implemented.");
+  }
+  getCurrentWaveNumber(waves: number[]): number {
+    throw new Error("Method not implemented.");
+  }
+  countSubwaves(waves: number[]): number[] {
+    throw new Error("Method not implemented.");
+  }
+  determineWaveTrend(waves: number[]): "impulse" | "corrective" {
+    throw new Error("Method not implemented.");
   }
 
   private findGartleyPattern(prices: number[]): HarmonicPattern | null {
@@ -77,6 +95,47 @@ export class AdvancedPatternAnalysis {
     }
     return null;
   }
+  getLast5Swings(swings: { x: number; y: number; }[]): { x: number; y: number; }[] {
+    throw new Error("Method not implemented.");
+  }
+  isCypherPattern(ratios: { [key: string]: number }): boolean {
+    const ab = ratios.AB;
+    const bc = ratios.BC;
+    const cd = ratios.CD;
+    const xc = ratios.XC; // Assuming this represents the XC leg ratio
+  
+    return (
+      ab >= 0.382 && ab <= 0.618 &&
+      bc >= 1.13 && bc <= 1.414 &&
+      Math.abs(cd - 0.786 * xc) < 0.05 // Using a small tolerance for CD retracement
+    );
+  }
+  
+  calculateFibRatios(xabcd: any): { [key: string]: number } {
+    const [X, A, B, C, D] = xabcd;
+    const ratios: { [key: string]: number } = {
+      XA: Math.abs((A.y - X.y) / (X.y - A.y)),
+      AB: Math.abs((B.y - A.y) / (A.y - X.y)),
+      BC: Math.abs((C.y - B.y) / (B.y - A.y)),
+      CD: Math.abs((D.y - C.y) / (C.y - B.y)),
+      XB: Math.abs((B.y - X.y) / (X.y - A.y)),
+      AC: Math.abs((C.y - A.y) / (A.y - B.y)),
+      XD: Math.abs((D.y - X.y) / (X.y - A.y)),
+      XC: Math.abs((C.y - X.y) / (X.y - A.y)), // Calculate XC ratio
+    };
+    return ratios;
+  }
+  
+  calculateCompletion(ratios: any): number {
+    return 1; // Placeholder: Assuming pattern is complete
+  }
+  
+  determineDirection(xabcd: { x: number; y: number; }[]): "bullish" | "bearish" {
+    const [X, , , , D] = xabcd;
+    return X.y < D.y ? "bullish" : "bearish";
+  }
+  
+  
 
   private findSwingPoints(prices: number[]): { x: number; y: number }[] {
     const swings: { x: number; y: number }[] = [];

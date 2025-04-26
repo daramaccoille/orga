@@ -1,3 +1,5 @@
+import { MT5Position } from "./types";
+
 export interface RiskParameters {
   maxLossPerTrade: number;
   maxDailyLoss: number;
@@ -39,6 +41,6 @@ export class RiskManager {
 
   private calculatePositionSize(riskAmount: number, position: MT5Position): number {
     // Implement position sizing logic based on risk amount and current price
-    return Math.min(riskAmount / 1000, this.riskParams.maxLotSize);
+    return Math.min(riskAmount / 2000, this.riskParams.maxLotSize);
   }
 }

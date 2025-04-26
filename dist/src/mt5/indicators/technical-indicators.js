@@ -57,4 +57,122 @@ export class AdvancedTechnicalAnalysis {
         const squareDiffs = prices.slice(-period).map((price) => Math.pow(price - sma, 2));
         return Math.sqrt(squareDiffs.reduce((a, b) => a + b) / period);
     }
+    // add more methods for other indicators
+    calculateRSI(prices, period = 14) {
+        const deltas = prices.slice(-period - 1).map((price, i, arr) => (i > 0 ? price - arr[i - 1] : 0)).slice(1);
+        const gains = deltas.map((delta) => (delta > 0 ? delta : 0));
+        const losses = deltas.map((delta) => (delta < 0 ? Math.abs(delta) : 0));
+        const avgGain = this.calculateSMA(gains, period)[0];
+        const avgLoss = this.calculateSMA(losses, period)[0];
+        const rs = avgLoss === 0 ? Infinity : avgGain / avgLoss;
+        return 100 - 100 / (1 + rs);
+    }
+    calculateStochastic(prices, period = 14, kPeriod = 3, dPeriod = 3) {
+        const lows = prices.slice(-period).sort((a, b) => a - b);
+        const highs = prices.slice(-period).sort((a, b) => b - a);
+        const lowestLow = lows[0];
+        const highestHigh = highs[0];
+        const currentClose = prices[prices.length - 1];
+        const k = ((currentClose - lowestLow) / (highestHigh - lowestLow)) * 100;
+        const kValues = [];
+        for (let i = prices.length - period; i < prices.length; i++) {
+            const lows = prices.slice(i - period >= 0 ? i - period : 0, i).sort((a, b) => a - b);
+            const highs = prices.slice(i - period >= 0 ? i - period : 0, i).sort((a, b) => b - a);
+            const lowestLow = lows[0];
+            const highestHigh = highs[0];
+            const currentClose = prices[i];
+            kValues.push(((currentClose - lowestLow) / (highestHigh - lowestLow)) * 100);
+        }
+        const d = this.calculateSMA(kValues.slice(-kPeriod), kPeriod)[0];
+        return {
+            k: k,
+            d: d,
+        };
+    }
+    calculateATR(highs, lows, closes, period = 14) {
+        const trs = [];
+        for (let i = 1; i < highs.length; i++) {
+            const high = highs[i];
+            const low = lows[i];
+            const prevClose = closes[i - 1];
+            const tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
+            trs.push(tr);
+        }
+        return this.calculateSMA(trs, period)[0];
+    }
+    calculateIchimoku(highs, lows, periodTenkan = 9, periodKijun = 26, periodSenkouB = 52, periodChikou = 26) {
+        const tenkanValues = [];
+        const kijunValues = [];
+        const senkouBValues = [];
+        for (let i = periodTenkan - 1; i < highs.length; i++) {
+            const lowsTenkan = lows.slice(i - periodTenkan + 1, i + 1).sort((a, b) => a - b);
+            const highsTenkan = highs.slice(i - periodTenkan + 1, i + 1).sort((a, b) => b - a);
+            tenkanValues.push((lowsTenkan[0] + highsTenkan[0]) / 2);
+        }
+        for (let i = periodKijun - 1; i < highs.length; i++) {
+            const lowsKijun = lows.slice(i - periodKijun + 1, i + 1).sort((a, b) => a - b);
+            const highsKijun = highs.slice(i - periodKijun + 1, i + 1).sort((a, b) => b - a);
+            kijunValues.push((lowsKijun[0] + highsKijun[0]) / 2);
+        }
+        for (let i = periodSenkouB - 1; i < highs.length; i++) {
+            const lowsSenkouB = lows.slice(i - periodSenkouB + 1, i + 1).sort((a, b) => a - b);
+            const highsSenkouB = highs.slice(i - periodSenkouB + 1, i + 1).sort((a, b) => b - a);
+            senkouBValues.push((lowsSenkouB[0] + highsSenkouB[0]) / 2);
+        }
+        const tenkan = tenkanValues[tenkanValues.length - 1];
+        const kijun = kijunValues[kijunValues.length - 1];
+        const senkouA = (tenkan + kijun) / 2;
+        const senkouB = senkouBValues[senkouBValues.length - 1];
+        const chikou = close.length - 1 - periodChikou;
+        return {
+            tenkan: tenkan,
+            kijun: kijun,
+            senkouA: senkouA,
+            senkouB: senkouB,
+            chikou: chikou
+        };
+    }
+    // add for SMA strategy
+    calculateSMAs(prices, shortPeriod = 20, longPeriod = 50) {
+        const shortSMA = this.calculateSMA(prices, shortPeriod)[this.calculateSMA(prices, shortPeriod).length - 1];
+        const longSMA = this.calculateSMA(prices, longPeriod)[this.calculateSMA(prices, longPeriod).length - 1];
+        return {
+            short: shortSMA,
+            long: longSMA,
+        };
+    }
+    calculateTimeframedIndicators(prices) {
+        const timeframes = {
+            '1H': {
+                macd: { main: 0, signal: 0, histogram: 0 },
+                rsi: 0,
+                sma20: 0, // Placeholder for sma20
+                sma50: 0, // Placeholder for sma50
+                bollingerBands: { upperBand: 0, lowerBand: 0, middleBand: 0 }, // Placeholder for bollingerBands
+                close: 0, // Placeholder for close
+            },
+            '4H': {
+                macd: { main: 0, signal: 0, histogram: 0 },
+                rsi: 0,
+                sma20: 0, // Placeholder for sma20
+                sma50: 0, // Placeholder for sma50
+                bollingerBands: { upperBand: 0, lowerBand: 0, middleBand: 0 }, // Placeholder for bollingerBands
+                close: 0, // Placeholder for close
+            },
+            '1D': {
+                macd: { main: 0, signal: 0, histogram: 0 },
+                rsi: 0,
+                sma20: 0, // Placeholder for sma20
+                sma50: 0, // Placeholder for sma50
+                bollingerBands: { upperBand: 0, lowerBand: 0, middleBand: 0 }, // Placeholder for bollingerBands
+                close: 0, // Placeholder for close
+            },
+        };
+        for (const timeframe in prices) {
+            const priceArray = prices[timeframe];
+            timeframes[timeframe].macd = this.calculateMACD(priceArray);
+            timeframes[timeframe].rsi = this.calculateRSI(priceArray);
+        }
+        return timeframes;
+    }
 }

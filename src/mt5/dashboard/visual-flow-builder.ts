@@ -1,4 +1,5 @@
 import { FlowNode } from '../types';
+import { HarmonicPatternAnalyzer } from '../indicators/harmonic-patterns';
 
 interface NodeConfig {
   id: string;
@@ -11,7 +12,10 @@ export class VisualFlowBuilder {
   private nodes: Map<string, FlowNode> = new Map();
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
-  protected configPanel: HTMLElement;
+  protected configPanel!: HTMLElement;
+  handleDragOver: any;
+  handleDrop: any;
+  protected handleNodeClick(event: MouseEvent): void {  }
 
   constructor(canvasId: string) {
     this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
@@ -32,6 +36,7 @@ export class VisualFlowBuilder {
       data,
       position,
       connections: [],
+      typeFlow: 'INDICATOR'
     };
     this.nodes.set(node.id, node);
     this.drawNode(node);
@@ -47,6 +52,9 @@ export class VisualFlowBuilder {
     this.ctx.fillStyle = 'white';
     this.ctx.fillText(node.type, node.position.x + 10, node.position.y + 30);
   }
+  getNodeColor(type: string): string | CanvasGradient | CanvasPattern {
+    throw new Error('Method not implemented.');
+  }
 
   private drawConnections() {
     this.nodes.forEach((node) => {
@@ -58,9 +66,15 @@ export class VisualFlowBuilder {
       });
     });
   }
+  drawConnection(node: FlowNode, target: FlowNode) {
+    throw new Error('Method not implemented.');
+  }
 
   exportStrategy(): AdvancedStrategyComponent[] {
     return this.convertNodesToStrategy(Array.from(this.nodes.values()));
+  }
+  convertNodesToStrategy(arg0: FlowNode[]): AdvancedStrategyComponent[] {
+    throw new Error('Method not implemented.');
   }
 
   protected showConfigPanel(node: FlowNode) {
@@ -76,14 +90,21 @@ export class EnhancedVisualFlowBuilder extends VisualFlowBuilder {
     this.configPanel = document.getElementById(configPanelId)!;
     this.initializeConfigPanel();
   }
+  initializeConfigPanel() {
+    throw new Error('Method not implemented.');
+  }
 
-  private handleNodeClick(event: MouseEvent) {
+  protected handleNodeClick(event: MouseEvent) {
     const node = this.findNodeAtPosition(event.offsetX, event.offsetY);
     if (node) {
       this.selectedNode = node;
       this.showConfigPanel(node);
     }
   }
+  findNodeAtPosition(offsetX: number, offsetY: number): FlowNode | null {
+    return null;
+  }
+  
 
   private getNodeConfig(type: FlowNode['type']): NodeConfig {
     switch (type) {
@@ -97,16 +118,17 @@ export class EnhancedVisualFlowBuilder extends VisualFlowBuilder {
           ]),
           validation: (value: number) => value > 0 && value <= 200,
         };
-      case 'PATTERN':
-        return {
-          id: 'pattern-config',
-          type: 'PATTERN',
-          parameters: new Map([
-            ['patternType', { type: 'select', options: Object.keys(PATTERN_RATIOS) }],
-            ['tolerance', { type: 'number', default: 0.05, min: 0.01, max: 0.1 }],
-          ]),
-          validation: (value: number) => value >= 0.01 && value <= 0.1,
-        };
+        case 'PATTERN':
+          return {
+            id: 'pattern-config',
+            type: 'PATTERN',
+            parameters: new Map([
+              ['patternType', { type: 'select', options: Object.keys(HarmonicPatternAnalyzer.PATTERN_RATIOS) }],
+              ['tolerance', { type: 'number', default: 0.05, min: 0.01, max: 0.1 }],
+            ]),
+            validation: (value: number) => value >= 0.01 && value <= 0.1,
+          };
+    
       // Add more configurations for other node types
       default:
         return {
@@ -143,7 +165,7 @@ export class EnhancedVisualFlowBuilder extends VisualFlowBuilder {
         <select class="form-control" id="${key}">
           ${config.options
             .map(
-              (opt) => `
+              (opt: any) => `
             <option value="${opt}">${opt}</option>
           `
             )

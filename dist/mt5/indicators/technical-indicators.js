@@ -176,3 +176,25 @@ export class AdvancedTechnicalAnalysis {
         return timeframes;
     }
 }
+export class TechnicalIndicators {
+    calculateRSI(prices) {
+        // Implement RSI calculation
+        return 50; // Placeholder
+    }
+    calculateMACD(prices) {
+        // Implement MACD calculation
+        return {
+            main: 0,
+            signal: 0,
+            histogram: 0,
+        };
+    }
+    calculateMAs(prices) {
+        // Implement Moving Averages calculation
+        return {
+            ma20: 0,
+            ma50: 0,
+            ma200: 0,
+        };
+    }
+}

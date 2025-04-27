@@ -13,9 +13,9 @@
     
   "dev": "nodemon --watch --ext 'ts,json' --exec 'npm run build && npm run start'",
   
-    
-  "build": "tsc",
-  
+  "build": "tsc && npm run copy-files",
+  "copy-files": "mkdir -p dist/public && cp -r src/public/* dist/public && mkdir -p dist/views && cp -r src/views/* dist/views",
+ 
     
   "test": "jest",
   

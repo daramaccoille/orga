@@ -1,0 +1,51 @@
+/** Add styles here */
+body {
+    background-color: #f4f4f4;
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 20px;
+    color: #333;
+}
+
+h1, h2 {
+    color: #007bff;
+    margin-bottom: 15px;
+}
+
+#api-data, #my-form {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+#api-data p {
+    margin: 5px 0;
+}
+
+#data-form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#data-form input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+#data-form button[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#data-form button[type="submit"]:hover {
+    background-color: #0056b3;
+}

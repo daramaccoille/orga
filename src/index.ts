@@ -82,8 +82,11 @@ app.post('/api/prices', async (req, res) => {
       if (!Array.isArray(prices) || prices.length === 0) {
           return res.status(400).json({ message: 'Invalid or empty prices array provided' });
       }
+      // Calculate indicators
+      const rsi = indicators.calculateRSI(prices);
+      const macd = indicators.calculateMACD(prices);
 
-      res.status(200).json({ message: 'Prices received successfully', prices });
+      res.status(200).json({ message: 'Prices received successfully', prices, rsi, macd });
   } catch (error) {
       console.error('Error processing prices:', error);
       res.status(500).json({ message: 'Error processing prices' });

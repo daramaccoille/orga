@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>My App</title>
-    <link rel="stylesheet" type="text/css" href=",,/public/styles.css" />
+    <link rel="stylesheet" type="text/css" href="/styles.css" />
 </head>
 <body>
     <h1>Hello world!</h1>
@@ -31,6 +31,11 @@
             <input type="text" id="prices-input" name="prices" required>
             <button type="submit">Send Prices</button>
         </form>
+         <div id="indicators-data">
+            <h2>Indicators:</h2>
+            <p>RSI: <span id="rsi"></span></p>
+            <p>MACD - Main: <span id="macd-main"></span> Signal: <span id="macd-signal"></span> Histogram: <span id="macd-histogram"></span></p>
+        </div>
     </div>
 
     <script>
@@ -110,8 +115,11 @@
                  return response.json();
              })
              .then(data => {
-                 console.log('Prices received by server:', data);
-                 // Handle the server's response here (e.g., display the result)
+                console.log('Prices received by server:', data);
+                document.getElementById('rsi').textContent = data.rsi;
+                document.getElementById('macd-main').textContent = data.macd.main;
+                document.getElementById('macd-signal').textContent = data.macd.signal;
+                document.getElementById('macd-histogram').textContent = data.macd.histogram;
              })
              .catch(error => {
                  console.error('There has been a problem with your fetch operation:', error);

@@ -1,4 +1,28 @@
-export class AdvancedTechnicalAnalysis {
+export class TechnicalIndicators {
+    calculateRSI(prices, period = 14) {
+        const deltas = prices.slice(-period - 1).map((price, i, arr) => (i > 0 ? price - arr[i - 1] : 0)).slice(1);
+        const gains = deltas.map((delta) => (delta > 0 ? delta : 0));
+        const losses = deltas.map((delta) => (delta < 0 ? Math.abs(delta) : 0));
+        const avgGain = this.calculateSMA(gains, period);
+        const avgLoss = this.calculateSMA(losses, period);
+        const rs = avgLoss === 0 ? Infinity : avgGain / avgLoss;
+        return Math.round(100 - 100 / (1 + rs));
+    }
+    calculateSMA(prices, period) {
+        if (prices.length < period) {
+            return 0; // Not enough data for accurate calculation
+        }
+        const sum = prices.slice(prices.length - period).reduce((a, b) => a + b, 0);
+        return Math.round(sum / period);
+    }
+    calculateEMA(prices, period) {
+        const multiplier = 2 / (period + 1);
+        const ema = [prices[0]];
+        for (let i = 1; i < prices.length; i++) {
+            ema.push((prices[i] - ema[i - 1]) * multiplier + ema[i - 1]);
+        }
+        return ema;
+    }
     calculateMACD(prices, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9) {
         const fastEMA = this.calculateEMA(prices, fastPeriod);
         const slowEMA = this.calculateEMA(prices, slowPeriod);
@@ -6,9 +30,9 @@ export class AdvancedTechnicalAnalysis {
         const signalLine = this.calculateEMA(macdLine, signalPeriod);
         const histogram = macdLine.map((macd, i) => macd - signalLine[i]);
         return {
-            main: macdLine[macdLine.length - 1],
-            signal: signalLine[signalLine.length - 1],
-            histogram: histogram[histogram.length - 1],
+            main: Math.round(macdLine[macdLine.length - 1]),
+            signal: Math.round(signalLine[signalLine.length - 1]),
+            histogram: Math.round(histogram[histogram.length - 1]),
         };
     }
     calculateFibonacci(high, low) {
@@ -28,44 +52,19 @@ export class AdvancedTechnicalAnalysis {
     }
     calculateBollinger(prices, period = 20, stdDev = 2) {
         const sma = this.calculateSMA(prices, period);
-        const middle = sma[sma.length - 1];
+        const middle = sma;
         const std = this.calculateStdDev(prices, period);
         return {
-            upper: middle + std * stdDev,
-            middle: middle,
-            lower: middle - std * stdDev,
-            bandwidth: (middle + std * stdDev - (middle - std * stdDev)) / middle,
+            upper: Math.round(middle + std * stdDev),
+            middle: Math.round(middle),
+            lower: Math.round(middle - std * stdDev),
+            bandwidth: Math.round((middle + std * stdDev - (middle - std * stdDev)) / middle),
         };
     }
-    calculateEMA(prices, period) {
-        const multiplier = 2 / (period + 1);
-        const ema = [prices[0]];
-        for (let i = 1; i < prices.length; i++) {
-            ema.push((prices[i] - ema[i - 1]) * multiplier + ema[i - 1]);
-        }
-        return ema;
-    }
-    calculateSMA(prices, period) {
-        const sma = [];
-        for (let i = period - 1; i < prices.length; i++) {
-            sma.push(prices.slice(i - period + 1, i + 1).reduce((a, b) => a + b) / period);
-        }
-        return sma;
-    }
     calculateStdDev(prices, period) {
-        const sma = this.calculateSMA(prices.slice(-period), period)[0];
+        const sma = this.calculateSMA(prices.slice(-period), period);
         const squareDiffs = prices.slice(-period).map((price) => Math.pow(price - sma, 2));
-        return Math.sqrt(squareDiffs.reduce((a, b) => a + b) / period);
-    }
-    // add more methods for other indicators
-    calculateRSI(prices, period = 14) {
-        const deltas = prices.slice(-period - 1).map((price, i, arr) => (i > 0 ? price - arr[i - 1] : 0)).slice(1);
-        const gains = deltas.map((delta) => (delta > 0 ? delta : 0));
-        const losses = deltas.map((delta) => (delta < 0 ? Math.abs(delta) : 0));
-        const avgGain = this.calculateSMA(gains, period)[0];
-        const avgLoss = this.calculateSMA(losses, period)[0];
-        const rs = avgLoss === 0 ? Infinity : avgGain / avgLoss;
-        return 100 - 100 / (1 + rs);
+        return Math.round(Math.sqrt(squareDiffs.reduce((a, b) => a + b) / period));
     }
     calculateStochastic(prices, period = 14, kPeriod = 3, dPeriod = 3) {
         const lows = prices.slice(-period).sort((a, b) => a - b);
@@ -83,10 +82,10 @@ export class AdvancedTechnicalAnalysis {
             const currentClose = prices[i];
             kValues.push(((currentClose - lowestLow) / (highestHigh - lowestLow)) * 100);
         }
-        const d = this.calculateSMA(kValues.slice(-kPeriod), kPeriod)[0];
+        const d = this.calculateSMA(kValues.slice(-kPeriod), kPeriod);
         return {
-            k: k,
-            d: d,
+            k: Math.round(k),
+            d: Math.round(d),
         };
     }
     calculateATR(highs, lows, closes, period = 14) {
@@ -98,9 +97,9 @@ export class AdvancedTechnicalAnalysis {
             const tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
             trs.push(tr);
         }
-        return this.calculateSMA(trs, period)[0];
+        return Math.round(this.calculateSMA(trs, period));
     }
-    calculateIchimoku(highs, lows, periodTenkan = 9, periodKijun = 26, periodSenkouB = 52, periodChikou = 26) {
+    calculateIchimoku(highs, lows, closes, periodTenkan = 9, periodKijun = 26, periodSenkouB = 52, periodChikou = 26) {
         const tenkanValues = [];
         const kijunValues = [];
         const senkouBValues = [];
@@ -123,22 +122,22 @@ export class AdvancedTechnicalAnalysis {
         const kijun = kijunValues[kijunValues.length - 1];
         const senkouA = (tenkan + kijun) / 2;
         const senkouB = senkouBValues[senkouBValues.length - 1];
-        const chikou = close.length - 1 - periodChikou;
+        const chikou = closes.length - 1 - periodChikou;
         return {
-            tenkan: tenkan,
-            kijun: kijun,
-            senkouA: senkouA,
-            senkouB: senkouB,
-            chikou: chikou
+            tenkan: Math.round(tenkan),
+            kijun: Math.round(kijun),
+            senkouA: Math.round(senkouA),
+            senkouB: Math.round(senkouB),
+            chikou: Math.round(chikou)
         };
     }
     // add for SMA strategy
     calculateSMAs(prices, shortPeriod = 20, longPeriod = 50) {
-        const shortSMA = this.calculateSMA(prices, shortPeriod)[this.calculateSMA(prices, shortPeriod).length - 1];
-        const longSMA = this.calculateSMA(prices, longPeriod)[this.calculateSMA(prices, longPeriod).length - 1];
+        const shortSMA = this.calculateSMA(prices, shortPeriod);
+        const longSMA = this.calculateSMA(prices, longPeriod);
         return {
-            short: shortSMA,
-            long: longSMA,
+            short: Math.round(shortSMA),
+            long: Math.round(longSMA),
         };
     }
     calculateTimeframedIndicators(prices) {
@@ -174,27 +173,5 @@ export class AdvancedTechnicalAnalysis {
             timeframes[timeframe].rsi = this.calculateRSI(priceArray);
         }
         return timeframes;
-    }
-}
-export class TechnicalIndicators {
-    calculateRSI(prices) {
-        // Implement RSI calculation
-        return 50; // Placeholder
-    }
-    calculateMACD(prices) {
-        // Implement MACD calculation
-        return {
-            main: 0,
-            signal: 0,
-            histogram: 0,
-        };
-    }
-    calculateMAs(prices) {
-        // Implement Moving Averages calculation
-        return {
-            ma20: 0,
-            ma50: 0,
-            ma200: 0,
-        };
     }
 }
